@@ -46,7 +46,7 @@ int main() {
 		   XTestFakeButtonEvent(display, 1, True, CurrentTime);
 		   XTestFakeButtonEvent(display, 1, False, CurrentTime);
 		   break;
-	case XK_g: /* Hold and Release left button down */
+	case XK_v: /* Hold and Release left button down */
 		   if (ishover) {
 			   XTestFakeButtonEvent(display, 1, False, CurrentTime);
 			   ishover = 0;
