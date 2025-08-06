@@ -12,6 +12,35 @@
 Window root;
 Display *display;
 
+int
+is_modifier(KeySym keysym)
+{
+	/* `XK_Shift_L` is used for changing the speed of the cursor */
+	KeySym modifiers[] = {
+		XK_Shift_R,
+		XK_Control_L,
+		XK_Control_R,
+		XK_Alt_L,
+		XK_Alt_R,
+		XK_Meta_L,
+		XK_Meta_R,
+		XK_Super_L,
+		XK_Super_R,
+		XK_Hyper_L,
+		XK_Hyper_R,
+		XK_Caps_Lock,
+		XK_Num_Lock,
+		XK_Scroll_Lock,
+	};
+	int n = sizeof(modifiers) / sizeof(modifiers[0]);
+	for (int i = 0; i < n; i++)
+		if (keysym == modifiers[i])
+			return 1;
+
+	return 0;
+}
+
+
 static void
 die(char *errmsg)
 {
@@ -92,11 +121,13 @@ int main() {
 		   XTestFakeButtonEvent(display, 5, True, CurrentTime);
 		   XTestFakeButtonEvent(display, 5, False, CurrentTime);
 		   break;
-	case XK_q: // Quit
-		   printf("Exiting mouse control mode.\n");
-		   XUngrabKeyboard(display, CurrentTime);
-		   XCloseDisplay(display);
-		   return 0;
+	default:
+		   if (is_modifier(keysym) || keysym == XK_Escape || keysym == XK_space || keysym == XK_q) {
+		   	printf("Exiting mouse control mode.\n");
+		   	XUngrabKeyboard(display, CurrentTime);
+		   	XCloseDisplay(display);
+		   	return 0;
+		   }
 	}
 
         if (dx || dy) {
