@@ -1,0 +1,2 @@
+[ ] BSD support
+[ ] Emacs mode
