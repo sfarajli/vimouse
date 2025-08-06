@@ -3,24 +3,46 @@
 #include <X11/extensions/XTest.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <time.h>
 
 #define MOVE_AMOUNT 10
 #define FAST_AMOUNT 30
 
+Window root;
+Display *display;
+
+static void
+die(char *errmsg)
+{
+	fprintf(stderr, "%s\n", errmsg);
+	exit(1);
+}
+
+static void
+GrabKeyboard(void)
+{
+	display = XOpenDisplay(NULL);
+	if (!display)
+		die("Failed to open Xdisplay");
+
+	struct timespec ts = { .tv_sec = 0, .tv_nsec = 1000000  };
+
+	root = DefaultRootWindow(display);
+	/* try to grab keyboard, we may have to wait for another process to ungrab */
+	for (int i = 0; i < 1000; i++) {
+		if (XGrabKeyboard(display, root, True, GrabModeAsync, GrabModeAsync, CurrentTime) == GrabSuccess)
+			return;
+
+		nanosleep(&ts, NULL);
+	}
+	die("Failed to grab keyboard");
+}
+
+
 int main() {
-    Display *display = XOpenDisplay(NULL);
-    if (!display) {
-        fprintf(stderr, "Cannot open X display\n");
-        return 1;
-    }
 
-    Window root = DefaultRootWindow(display);
-
-    // Grab the keyboard for modal operation
-    if (XGrabKeyboard(display, root, True, GrabModeAsync, GrabModeAsync, CurrentTime) != GrabSuccess) {
-        fprintf(stderr, "Failed to grab keyboard\n");
-        return 1;
-    }
+    GrabKeyboard();
 
     printf("Mouse control mode activated. Press 'q' to exit.\n");
 
