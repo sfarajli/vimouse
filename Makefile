@@ -1,6 +1,6 @@
 .POSIX:
 
-VERSION  = 0.1
+VERSION  = 0.11
 
 CC       = cc
 LDFLAGS  = -lX11 -lXtst
